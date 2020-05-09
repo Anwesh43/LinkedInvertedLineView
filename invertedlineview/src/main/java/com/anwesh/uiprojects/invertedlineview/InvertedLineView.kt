@@ -34,7 +34,7 @@ fun Canvas.drawInvertedLine(i : Int, scale : Float, size : Float, paint : Paint)
         val sfij : Float = sfi.divideScale(j, lines)
         val x : Float = size * (1 - j) * sfij
         val y : Float = size * j * sfij
-        drawLine(size * i, 0f, x, y, paint)
+        drawLine(size * j, 0f, size * j + x, y, paint)
     }
 }
 
@@ -52,6 +52,9 @@ fun Canvas.drawILNode(i : Int, scale : Float, paint : Paint) {
     val h : Float = height.toFloat()
     val gap : Float = h / (nodes + 1)
     val size : Float = gap / sizeFactor
+    if (scale <=0 || scale >= 1f) {
+        return
+    }
     paint.color = foreColor
     paint.strokeCap = Paint.Cap.ROUND
     paint.strokeWidth = Math.min(w, h) / strokeFactor
@@ -122,6 +125,7 @@ class InvertedLineView(ctx : Context) : View(ctx) {
         fun stop() {
             if (animated) {
                 animated = false
+                view.postInvalidate()
             }
         }
     }
