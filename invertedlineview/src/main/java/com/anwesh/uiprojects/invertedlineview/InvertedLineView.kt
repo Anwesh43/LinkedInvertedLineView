@@ -26,3 +26,37 @@ fun Int.inverse() : Float = 1f / this
 fun Float.maxScale(i : Int, n : Int) : Float = Math.max(0f, this - i * n.inverse())
 fun Float.divideScale(i : Int, n : Int) : Float = Math.min(n.inverse(), maxScale(i, n)) * n
 fun Float.sinify() : Float = Math.sin(this * Math.PI).toFloat()
+
+fun Canvas.drawInvertedLine(i : Int, scale : Float, size : Float, paint : Paint) {
+    val sf : Float = scale.sinify()
+    val sfi : Float = sf.divideScale(i, parts)
+    for (j in 0..(lines - 1)) {
+        val sfij : Float = sfi.divideScale(j, lines)
+        val x : Float = size * (1 - j) * sfij
+        val y : Float = size * j * sfij
+        drawLine(size * i, 0f, x, y, paint)
+    }
+}
+
+fun Canvas.drawInvertedLines(scale : Float, size : Float, paint : Paint) {
+    for (i in 0..(parts - 1)) {
+        save()
+        scale(1f - 2 * i, 1f - 2 * i)
+        drawInvertedLine(i, scale, size, paint)
+        restore()
+    }
+}
+
+fun Canvas.drawILNode(i : Int, scale : Float, paint : Paint) {
+    val w : Float = width.toFloat()
+    val h : Float = height.toFloat()
+    val gap : Float = h / (nodes + 1)
+    val size : Float = gap / sizeFactor
+    paint.color = foreColor
+    paint.strokeCap = Paint.Cap.ROUND
+    paint.strokeWidth = Math.min(w, h) / strokeFactor
+    save()
+    translate(w / 2, gap * (i + 1))
+    drawInvertedLines(scale, size, paint)
+    restore()
+}
